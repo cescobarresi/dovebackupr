@@ -1,0 +1,13 @@
+[Unit]
+Description=Job that runs dovebackupr as a daemon
+Documentation=
+
+[Service]
+Type=simple
+ExecStart=/opt/dovebackupr/environment/bin/dovebackupr -c /opt/dovebackupr/dovebackupr.conf run
+Restart=on-failure
+ExecStop=/bin/kill -SIGINT $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+
