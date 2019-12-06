@@ -69,11 +69,13 @@ def spawn_mailbox_backup(mailbox):
 
     doveadm_backup = subprocess.Popen(cmd, stderr=subprocess.PIPE, universal_newlines=True)
     logger.debug("spawn_mailbox_backup: run backup for \"%s\"" % mailbox['name'])
+    stdout, stderr = doveadm_backup.communicate()
 
     return {
         'since':datetime.now(),
         'last_timeout_warning':datetime.now(),
         'subprocess':doveadm_backup, 
+        'error':stderr[-200:], # last 200 bytes of error stream
         'name':mailbox['name']
     }
 
@@ -160,7 +162,7 @@ def main_loop(all_mailbox, run_forever, config):
             return_code = running['subprocess'].poll()
             if return_code is not None:
                 logger.debug("main_loop: subprocess for '%s' finished with return code '%s'" %(running['name'], return_code))
-                running['error'] = running['subprocess'].stderr.read()
+                #running['error'] = running['subprocess'].stderr.read()
                 if return_code == 0:
                     # Successful backup
                     logger.info("backup of '%s' finished in '%s'" % (running['name'], datetime.now() - running['since'] ))
